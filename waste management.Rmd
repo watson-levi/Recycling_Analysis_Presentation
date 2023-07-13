@@ -1,0 +1,63 @@
+---
+title: "Analytics Proj Q5"
+output: html_document
+date: "2022-12-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+
+wm <- Waste_Management_by_Method %>%
+  pivot_longer(cols = c(Recycling, Organics, Onsite, WTE, Landfilled), names_to = 'Method', values_to = 'Tons')
+
+wm$Year = as.numeric(wm$Year)
+```
+
+```{r}
+wmfilter = wm %>%
+  filter(County %in% c('Hennepin', 'Ramsey', 'Anoka', 'Washington', 'St. Louis - partial', 'Dakota'))
+```
+
+```{r}
+wm %>%
+  group_by(Year, Method) %>%
+  summarize(avgtons = mean(Tons), totaltons = sum(Tons)) %>%
+  ggplot(mapping = aes(x = Year, y = totaltons))+geom_area(aes(fill = Method))
+```
+```{r}
+wm %>%
+  group_by(Year, Method) %>%
+  summarize(avgtons = mean(Tons), totaltons = sum(Tons)) %>%
+  ggplot(mapping = aes(x = Year, y = totaltons))+geom_line(aes(color = Method))
+```
+```{r}
+wmfilter %>%
+#  group_by(Year, County) %>%
+#  summarize(avgtons = mean(Tons)) %>%
+  ggplot(aes(x = Year, y = Tons, fill = Method))+geom_col(position = 'fill')+facet_wrap(vars(County))+labs(y = 'Waste Ratio', title = 'Ratio of Different Waste Methods for Largest MN Counties')
+
+
+```
+
+
+```{r}
+wmfilter %>%
+#  group_by(Year, County) %>%
+#  summarize(avgtons = mean(Tons)) %>%
+  ggplot(aes(x = Year, y = Tons, color = Method))+geom_line()+facet_wrap(vars(County))+labs(title = 'Waste Methods over Time for Largest MN Counties')
+```
+
+
+```{r}
+wmfilter %>%
+  filter(Method == 'Recycling') %>%
+  ggplot(aes(x = Year, y = Tons, color = County))+geom_line()+labs(title = 'Recycling Pattern for Largest MN Counties')
+```
+
+
+
+
